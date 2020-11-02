@@ -25,19 +25,13 @@ export default function Login(){
 
     const login = (event) => {
         event.preventDefault()
-        console.log(loginForm)
         fetch("https://eco-mtk.herokuapp.com/api/v1/users/login", {
             method: "POST",
             body: JSON.stringify(loginForm),
             headers: { "Content-type": "application/json" }
         })
-        // fetch("https://eco-mtk.herokuapp.com/api/v1/users/")
         .then(res => res.json())
-        .then(data => {
-            if(data.message){
-                history.push('/dashboard')
-            }
-        })
+        .then(data => console.log(data))
         .catch(err => console.log(err))
     }
 
