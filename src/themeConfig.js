@@ -1,12 +1,13 @@
 import {createMuiTheme} from '@material-ui/core/styles'
-import amber from '@material-ui/core/colors/amber'
+import lime from '@material-ui/core/colors/lime'
 const theme = createMuiTheme({
 
     palette:{
         primary: {
-            main: amber[500],
-            light: amber[300],
-            dark: amber[800]
+            main: lime[500],
+            light: lime[300],
+            ld: lime[750],
+            dark: lime[800]
         }
     }
 

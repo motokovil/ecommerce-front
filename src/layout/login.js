@@ -1,50 +1,147 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import Box from '@material-ui/core/Box'
-import {makeStyles} from '@material-ui/core/styles'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
-import {useHistory} from "react-router-dom"
+import { Redirect, Link } from "react-router-dom"
+import {useCookies} from "react-cookie"
+import {makeStyles} from '@material-ui/core/styles';
+const jwt = require('jsonwebtoken')
 
-
-const useStyles = makeStyles((theme)=>({
-    
-}))
+//MATERIAL UI
+const useStyles = makeStyles((theme) => ({
+    Button:{
+        textDecoration: 'none',
+        marginRight: '5px'
+    },
+    title: {
+        flexGrow: 1
+    },
+    h:{
+        margin:0,
+    },
+    link:{
+        textDecoration: 'none',
+        color: 'inherit'
+    },
+    bgimagen: {
+        backgroundImage: 'url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgTjZ_YIT3Z_bjVZnbOx8DDYH1IcJU8srXjA&usqp=CAU")',
+    }
+}));
 
 export default function Login(){
     //Material UI
     const classes = useStyles()
+
     //Hooks
     const [loginForm, setLoginForm] = useState({email: '', password: ''});
-
-    //Movidas
+    const [cookies, setCookie] = useCookies(['token']);
+    const [isSuper, setIsSuper] = useState({superuser:null})
+    
+    //Funciones
     const onChangeInput = (event) => {
         setLoginForm({...loginForm, [event.target.name] : event.target.value });
     }
-
-    let history = useHistory()
-
+    const setToken = (token) => {
+        setCookie('token', token, {path:'/'})
+    }
+    const auth = (token) => {
+        try {
+            let access = jwt.verify(token, 'motk')
+            if(access.user_id){
+                console.log("Acceso permitido")
+                fetch("http://localhost:8000/users/"+access.user_id+"/")
+                .then(data=>data.json())
+                .then(user=>{
+                    setIsSuper({superuser:user.is_superuser})
+                    console.log(isSuper.superuser)
+                })
+            }
+            
+        } catch (error) {
+            console.log("No has iniciado sesión: ",error.message)
+        }
+        
+    }
     const login = (event) => {
         event.preventDefault()
-        fetch("https://eco-mtk.herokuapp.com/api/v1/users/login", {
+        fetch("http://localhost:8000/api/token/", {
             method: "POST",
             body: JSON.stringify(loginForm),
             headers: { "Content-type": "application/json" }
         })
         .then(res => res.json())
-        .then(data => console.log(data))
-        .catch(err => console.log(err))
+        .then(data => {
+            let access = jwt.verify(data.access,'motk')
+            if (access.user_id){
+                setToken(data.access)
+            }
+        })
+        .catch(err => console.log(err.message))
     }
 
+    //Redirecciona a (admin o dashboard) si hay un token verificado en las cookies
+    const permission = (issup) => {
+
+        switch (issup) {
+            case null:
+                return <Redirect to={"/Login"}/>
+            case true:
+                return <Redirect to={"/Admin"}/>
+            case false:
+                return <Redirect to={"/Dashboard"}/>
+            default:
+                break;
+        }
+    }
+
+    useEffect(()=>{
+        
+        try {
+            
+            let access = jwt.verify(cookies.token, 'motk')
+            fetch("http://localhost:8000/users/"+access.user_id+"/")
+            .then(data=>data.json())
+            .then(data=>{
+                setIsSuper({superuser:data.is_superuser})
+                console.log("Hay una Cookie disponible en el navegador")
+            })
+            .catch(error=>console.log(error))
+
+        } catch (error) {
+            console.log(error.message)
+        }
+    })
 
     return (
-        <Box 
-            bgcolor='primary.main'
+        <Box
+        bgcolor='primary.main'
+        height='100vh'
+        >
+
+            <Box 
+            p={2} 
+            display='flex'
+            justifyContent='flex-end'
+            bgcolor='primary.dark'
+            >
+                <Button 
+                variant='outlined' 
+                size='small'
+                className={classes.Button}
+                color='primary'
+                >
+                    <Link className={classes.link} to="/">Home</Link>
+                </Button>
+            </Box>
+
+            <Box 
             display='flex'
             justifyContent='center'
             alignItems='center'
             height='80vh'
-        >
-            <form onInput={onChangeInput} onSubmit={login}>
+            >
+
+            <form onInput={onChangeInput} onSubmit={login} >
                 <Box 
                     bgcolor='white'
                     display= 'flex'
@@ -53,12 +150,17 @@ export default function Login(){
                     color= 'primary.dark'
                     borderRadius= '5px'
                 >
-                    <h3>INICIA SESIÓN</h3>
+                    <Box
+                    height='80px'
+                    >
+                        <h2 className={classes.h}>Inicia Sesión</h2>
+                        <small>¡Que bueno verte por aquí!</small>
+                    </Box>
 
                     <TextField
-                        label="Email"
-                        id="email"
-                        name="email"
+                        label="username"
+                        id="username"
+                        name="username"
                         variant="outlined"
                         size="small"
                         margin="normal"
@@ -77,12 +179,13 @@ export default function Login(){
                         required
                     />
 
-                    <Button variant="contained" color="primary" type="submit">
+                    <Button  variant="contained" color="primary" type="submit">
                         Iniciar Sesión
                     </Button>
                     
                 </Box>
             </form>
+        </Box>
         </Box>
     )
 }
