@@ -48,13 +48,12 @@ export default function Login(){
         try {
             let access = jwt.verify(token, 'motk')
             if(access.user_id){
-                console.log("Acceso permitido")
                 fetch("http://localhost:8000/users/"+access.user_id+"/")
                 .then(data=>data.json())
                 .then(user=>{
                     setIsSuper({superuser:user.is_superuser})
-                    console.log(isSuper.superuser)
                 })
+                .catch(error=>console.log(error))
             }
             
         } catch (error) {
@@ -76,9 +75,9 @@ export default function Login(){
                 setToken(data.access)
             }
         })
+        .then(setTimeout(()=>{window.location.reload()},3000))
         .catch(err => console.log(err.message))
     }
-
     //Redirecciona a (admin o dashboard) si hay un token verificado en las cookies
     const permission = (issup) => {
 
@@ -90,26 +89,12 @@ export default function Login(){
             case false:
                 return <Redirect to={"/Dashboard"}/>
             default:
-                break;
+                return <Redirect to={"/"}/>
         }
     }
 
     useEffect(()=>{
-        
-        try {
-            
-            let access = jwt.verify(cookies.token, 'motk')
-            fetch("http://localhost:8000/users/"+access.user_id+"/")
-            .then(data=>data.json())
-            .then(data=>{
-                setIsSuper({superuser:data.is_superuser})
-                console.log("Hay una Cookie disponible en el navegador")
-            })
-            .catch(error=>console.log(error))
-
-        } catch (error) {
-            console.log(error.message)
-        }
+        auth(cookies.token)
     })
 
     return (
@@ -117,7 +102,7 @@ export default function Login(){
         bgcolor='primary.main'
         height='100vh'
         >
-
+            {permission(isSuper.superuser)}
             <Box 
             p={2} 
             display='flex'
