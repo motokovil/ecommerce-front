@@ -3,9 +3,6 @@ import React from 'react'
 //Redux
 // import {useSelector} from "react-redux"
 
-//Cookies
-// import {useCookies} from "react-cookie"
-
 //Router
 import {Link} from "react-router-dom";
 
@@ -32,10 +29,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Home(){
+
     //Hooks
     const classes = useStyles();
-    
-    //Funciones
 
     return (
         <Box
@@ -63,9 +59,12 @@ export default function Home(){
             >
 
                 <Box
+                p={2}
                 color='white'
-                mb='20px'
+                mb={1}
                 height='40vh'
+                bgcolor="primary.dark"
+                borderRadius={5}
                 >
                     <h1 className={classes.h}>Newsletter APP</h1>
                     <small>Designed for inspire</small>
@@ -73,7 +72,19 @@ export default function Home(){
 
                 <Box
                 p={2}
+                bgcolor='white'
+                borderRadius={5}
+                color='text.secondary'
+                mb={1}
+                >
+                    <h3 className={classes.h}>Suscribete</h3>
+                    <small>Ahora tienes la opción de suscribirte a tus boletines favoritos.</small>
+                </Box>
+
+                <Box
+                p={2}
                 border={2}
+                bgcolor="primary.dark"
                 borderColor='white'
                 borderRadius={5}
                 color='white'
@@ -83,15 +94,6 @@ export default function Home(){
                     <small>Mas de 80,000 historias para leer en la comodidad de tu dispositivo inteligente.</small>
                 </Box>
 
-                <Box
-                p={2}
-                bgcolor='white'
-                borderRadius={5}
-                color='text.secondary'
-                >
-                    <h3 className={classes.h}>Suscribete</h3>
-                    <small>Ahora tienes la opción de suscribirte a tus boletines favoritos.</small>
-                </Box>
 
             </Box>
         </Box>

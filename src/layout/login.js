@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react'
-import Box from '@material-ui/core/Box'
+import {useCookies} from "react-cookie"
 import TextField from '@material-ui/core/TextField'
+import {makeStyles} from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
 import { Redirect, Link } from "react-router-dom"
-import {useCookies} from "react-cookie"
-import {makeStyles} from '@material-ui/core/styles';
 const jwt = require('jsonwebtoken')
 
 //MATERIAL UI
@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Login(){
+
     //Material UI
     const classes = useStyles()
 
@@ -36,7 +37,7 @@ export default function Login(){
     const [loginForm, setLoginForm] = useState({email: '', password: ''});
     const [cookies, setCookie] = useCookies(['token']);
     const [isSuper, setIsSuper] = useState({superuser:null})
-    
+
     //Funciones
     const onChangeInput = (event) => {
         setLoginForm({...loginForm, [event.target.name] : event.target.value });
@@ -51,6 +52,7 @@ export default function Login(){
                 fetch("http://localhost:8000/users/"+access.user_id+"/")
                 .then(data=>data.json())
                 .then(user=>{
+                    console.log("Logged in")
                     setIsSuper({superuser:user.is_superuser})
                 })
                 .catch(error=>console.log(error))
@@ -75,7 +77,7 @@ export default function Login(){
                 setToken(data.access)
             }
         })
-        .then(setTimeout(()=>{window.location.reload()},3000))
+        .then(()=>{window.location.reload()})
         .catch(err => console.log(err.message))
     }
     //Redirecciona a (admin o dashboard) si hay un token verificado en las cookies
@@ -95,7 +97,7 @@ export default function Login(){
 
     useEffect(()=>{
         auth(cookies.token)
-    })
+    },[])
 
     return (
         <Box
