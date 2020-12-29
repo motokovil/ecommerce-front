@@ -80,7 +80,6 @@ export default function Login(){
         .then(()=>{window.location.reload()})
         .catch(err => console.log(err.message))
     }
-    //Redirecciona a (admin o dashboard) si hay un token verificado en las cookies
     const permission = (issup) => {
 
         switch (issup) {
