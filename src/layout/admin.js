@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Switch, Link, BrowserRouter as Router, Route } from "react-router-dom";
+import { 
+	Switch, 
+	Link, 
+	BrowserRouter as Router, 
+	Route,
+	useRouteMatch,
+	// useParams
+} from "react-router-dom";
 import { useCookies } from "react-cookie";
 import clsx from 'clsx';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -94,6 +101,8 @@ export default function PersistentDrawerLeft() {
 	const classes = useStyles();
 	const theme = useTheme();
 	const [open, setOpen] = useState(false);
+	//Router
+	let match = useRouteMatch();
 
 	const [, setIsSuper] = useState({ superuser: null })
 	const [cookies] = useCookies(['token']);
@@ -173,15 +182,15 @@ export default function PersistentDrawerLeft() {
 					}}
 				>
 					<div className={classes.drawerHeader}>
-						<IconButton color="primary.main" onClick={handleDrawerClose}>
+						<IconButton color="primary" onClick={handleDrawerClose}>
 							{theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
 						</IconButton>
 					</div>
 					<Divider />
 					<List>
 
-						<Link className={classes.link} to={"/boletines"}>
-							<ListItem button >
+						<Link className={classes.link} to={`${match.url}/Boletines`}>
+							<ListItem button key={"boletines"}>
 								<ListItemIcon>
 									<MailIcon />
 								</ListItemIcon>
@@ -209,7 +218,7 @@ export default function PersistentDrawerLeft() {
 					<div className={classes.drawerHeader} />
 					{
 						<Switch>
-							<Route path={"/boletines"} component={Boletines} />
+							<Route path={`${match.url}/Boletines`} component={Boletines} />
 						</Switch>
 					}
 				</main>

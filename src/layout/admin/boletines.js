@@ -76,7 +76,7 @@ export default function Boletines(){
 		{
 			boletines.map(item => (
 
-				<Grid item >
+				<Grid item key={item.id}>
 				<Card className={classes.root}>
 					<CardActionArea>
 						<CardMedia
@@ -90,7 +90,7 @@ export default function Boletines(){
 							<Typography gutterBottom variant="h6" component="h2">
 								{item.nombre}
 							</Typography>
-							<Typography variant="body2" color="textSecondary" component="p">
+							<Typography variant="body2" color="primary" component="p">
 								{item.descripcion}
 							</Typography>
 						</CardContent>
