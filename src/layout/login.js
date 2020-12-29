@@ -57,11 +57,11 @@ export default function Login(){
                 })
                 .catch(error=>console.log(error))
             }
-            
+
         } catch (error) {
             console.log("No has iniciado sesión: ",error.message)
         }
-        
+
     }
     const login = (event) => {
         event.preventDefault()
@@ -97,7 +97,7 @@ export default function Login(){
 
     useEffect(()=>{
         auth(cookies.token)
-    },[])
+    },[cookies.token])
 
     return (
         <Box
@@ -105,14 +105,14 @@ export default function Login(){
         height='100vh'
         >
             {permission(isSuper.superuser)}
-            <Box 
-            p={2} 
+            <Box
+            p={2}
             display='flex'
             justifyContent='flex-end'
             bgcolor='primary.dark'
             >
-                <Button 
-                variant='outlined' 
+                <Button
+                variant='outlined'
                 size='small'
                 className={classes.Button}
                 color='primary'
@@ -121,7 +121,7 @@ export default function Login(){
                 </Button>
             </Box>
 
-            <Box 
+            <Box
             display='flex'
             justifyContent='center'
             alignItems='center'
@@ -129,7 +129,7 @@ export default function Login(){
             >
 
             <form onInput={onChangeInput} onSubmit={login} >
-                <Box 
+                <Box
                     bgcolor='white'
                     display= 'flex'
                     flexDirection= 'column'
@@ -169,7 +169,7 @@ export default function Login(){
                     <Button  variant="contained" color="primary" type="submit">
                         Iniciar Sesión
                     </Button>
-                    
+
                 </Box>
             </form>
         </Box>

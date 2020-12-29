@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react"
+import React, {useState, useEffect, useCallback} from "react"
 import {useCookies} from "react-cookie";
 
 //MATERIAL UI
@@ -10,7 +10,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import { Grid, Box } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 
 const useStyles = makeStyles({
 	root: {
@@ -43,31 +43,35 @@ export default function Boletines(){
                 })
                 .catch(error=>console.log(error))
             }
-            
+
         } catch (error) {
             console.log("No has iniciado sesión: ", error.message)
         }
 	}
-	const getBoletines = () => {
-		fetch("http://localhost:8000/boletines/", {
-            method: "GET",
-            headers: { 
-				"Content-type": "application/json",
-				"Authorization": "Bearer "+cookies.token,
-			}
-        })
-		.then(res => res.json())
-		.then(res=> setboletines(res))
-		.catch(error=>console.log(error))
-	}
+	const getBoletines = useCallback(
+		() => {
+			fetch("http://localhost:8000/boletines/", {
+				method: "GET",
+				headers: {
+					"Content-type": "application/json",
+					"Authorization": "Bearer "+cookies.token,
+				}
+			})
+			.then(res => res.json())
+			.then(res=> setboletines(res))
+			.catch(error=>console.log(error))
+		},
+		[cookies.token],
+	)
 
 	useEffect(()=>{
+		console.log(cookies.token);
 		auth(cookies.token)
 		getBoletines()
-	},[])
+	},[cookies.token, getBoletines])
 
 
-	
+
 	return (
 		<Grid container spacing={2}>
 		{
