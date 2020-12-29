@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useCallback} from 'react'
 import {useCookies} from "react-cookie"
 import TextField from '@material-ui/core/TextField'
 import {makeStyles} from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
-import { Redirect, Link } from "react-router-dom"
+import { Link, useHistory } from "react-router-dom"
 const jwt = require('jsonwebtoken')
 
 //MATERIAL UI
@@ -32,6 +32,7 @@ export default function Login(){
 
     //Material UI
     const classes = useStyles()
+    const history = useHistory()
 
     //Hooks
     const [loginForm, setLoginForm] = useState({email: '', password: ''});
@@ -80,30 +81,33 @@ export default function Login(){
         .then(()=>{window.location.reload()})
         .catch(err => console.log(err.message))
     }
-    const permission = (issup) => {
+    const permission = useCallback(
+        (issup) => {
 
-        switch (issup) {
-            case null:
-                return <Redirect to={"/Login"}/>
-            case true:
-                return <Redirect to={"/Admin"}/>
-            case false:
-                return <Redirect to={"/Dashboard"}/>
-            default:
-                return <Redirect to={"/"}/>
-        }
-    }
+            switch (issup) {
+                case null:
+                    return history.push("/Login")
+                case true:
+                    return history.push("/Admin")
+                case false:
+                    return history.push("/Dashboard")
+                default:
+                    return history.push("/Login")
+            }
+        },
+        [history]
+    )
 
     useEffect(()=>{
         auth(cookies.token)
-    },[cookies.token])
+        permission(isSuper.superuser)
+    },[cookies.token, isSuper.superuser, permission])
 
     return (
         <Box
         bgcolor='primary.main'
         height='100vh'
         >
-            {permission(isSuper.superuser)}
             <Box
             p={2}
             display='flex'
