@@ -65,7 +65,6 @@ export default function Boletines(){
 	)
 
 	useEffect(()=>{
-		console.log(cookies.token);
 		auth(cookies.token)
 		getBoletines()
 	},[cookies.token, getBoletines])
