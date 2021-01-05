@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
 	Switch, 
 	Link, 
 	BrowserRouter as Router, 
 	Route,
 	useRouteMatch,
+	useHistory
 	// useParams
 } from "react-router-dom";
 import { useCookies } from "react-cookie";
@@ -24,14 +25,16 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
-import Boletines from "./admin/boletines";
 import Avatar from '@material-ui/core/Avatar';
+
+//SubComponentes
+import Boletines from "./admin/boletines";
+import Usuarios from "./admin/usuarios";
 
 const jwt = require('jsonwebtoken')
 
-const drawerWidth = 200;
+const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -101,12 +104,12 @@ export default function PersistentDrawerLeft() {
 	const classes = useStyles();
 	const theme = useTheme();
 	const [open, setOpen] = useState(false);
-	//Router
-	let match = useRouteMatch();
-
+	const history = useHistory()
 	const [, setIsSuper] = useState({ superuser: null })
 	const [cookies] = useCookies(['token']);
 	const [user, setUser] = useState({})
+	
+	let match = useRouteMatch();
 
 	const handleDrawerOpen = () => {
 		setOpen(true);
@@ -116,28 +119,32 @@ export default function PersistentDrawerLeft() {
 		setOpen(false);
 	};
 
-	const auth = (token) => {
-		try {
-			let access = jwt.verify(token, 'motk')
-			if (access.user_id) {
-				fetch("http://localhost:8000/users/" + access.user_id + "/")
-					.then(data => data.json())
-					.then(user => {
-						console.log("Logged in")
-						setIsSuper({ superuser: user.is_superuser })
-						setUser(user)
-					})
-					.catch(error => console.log(error))
-			}
+	const auth = useCallback(
+		(token) => {
+			try {
+				let access = jwt.verify(token, 'motk')
+				if (access.user_id) {
+					fetch("http://localhost:8000/users/" + access.user_id + "/")
+						.then(data => data.json())
+						.then(user => {
+							console.log("Logged in")
+							setIsSuper({ superuser: user.is_superuser })
+							setUser(user)
+						})
+						.catch(error => console.log(error))
+				}
 
-		} catch (error) {
-			console.log("No has iniciado sesión: ", error.message)
-		}
-	}
+			} catch (error) {
+				console.log("No has iniciado sesión: ", error.message)
+				history.push("/Login")
+				window.location.reload()
+			}
+		}, [history]
+	)
 
 	useEffect(() => {
 		auth(cookies.token)
-	}, [cookies.token])
+	}, [cookies.token, auth])
 
 	return (
 		<Router>
@@ -188,25 +195,25 @@ export default function PersistentDrawerLeft() {
 					</div>
 					<Divider />
 					<List>
-
-						<Link className={classes.link} to={`${match.url}/Boletines`}>
-							<ListItem button key={"boletines"}>
-								<ListItemIcon>
-									<MailIcon />
-								</ListItemIcon>
-								<ListItemText primary={"Boletines"} />
-							</ListItem>
-						</Link>
-
+						<ListItem button >
+							<ListItemIcon>
+								<MailIcon />
+							</ListItemIcon>
+							<Link className={classes.link} to={`${match.url}/Boletines`}>
+								<ListItemText primary="Boletines" />
+							</Link>
+						</ListItem>
 					</List>
 					<Divider />
 					<List>
-						{['All mail', 'Trash', 'Spam'].map((text, index) => (
-							<ListItem button key={text}>
-								<ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-								<ListItemText primary={text} />
-							</ListItem>
-						))}
+						<ListItem button >
+							<ListItemIcon>
+								<MailIcon />
+							</ListItemIcon>
+							<Link className={classes.link} to={`${match.url}/Usuarios`}>
+								<ListItemText primary="Usuarios" />
+							</Link>
+						</ListItem>
 					</List>
 				</Drawer>
 
@@ -219,6 +226,7 @@ export default function PersistentDrawerLeft() {
 					{
 						<Switch>
 							<Route path={`${match.url}/Boletines`} component={Boletines} />
+							<Route path={`${match.url}/Usuarios`} component={Usuarios}/>
 						</Switch>
 					}
 				</main>

@@ -50,7 +50,7 @@ export default function Login(){
         try {
             let access = jwt.verify(token, 'motk')
             if(access.user_id){
-                fetch("http://localhost:8000/users/"+access.user_id+"/")
+                fetch("http://nl-mtk.herokuapp.com/api/v1/users/"+access.user_id+"/")
                 .then(data=>data.json())
                 .then(user=>{
                     console.log("Logged in")
@@ -60,13 +60,13 @@ export default function Login(){
             }
 
         } catch (error) {
-            console.log("No has iniciado sesión: ",error.message)
+            console.log("No hay sesiones activas: ",error.message)
         }
 
     }
     const login = (event) => {
         event.preventDefault()
-        fetch("http://localhost:8000/api/token/", {
+        fetch("http://nl-mtk.herokuapp.com/api/token/", {
             method: "POST",
             body: JSON.stringify(loginForm),
             headers: { "Content-type": "application/json" }
@@ -76,11 +76,22 @@ export default function Login(){
             let access = jwt.verify(data.access,'motk')
             if (access.user_id){
                 setToken(data.access)
+                fetch("http://localhost:8000/users/" + access.user_id + "/")
+                .then(data => data.json())
+                .then(user=>{
+                    if(user.is_superuser){
+                        history.push("/Admin")
+                        window.location.reload()
+                    }else{
+                        history.push("/Dashboard")
+                        window.location.reload()
+                    }
+                })
             }
         })
-        .then(()=>{window.location.reload()})
         .catch(err => console.log(err.message))
     }
+
     const permission = useCallback(
         (issup) => {
 
@@ -97,10 +108,10 @@ export default function Login(){
         },
         [history]
     )
-
+    
     useEffect(()=>{
         auth(cookies.token)
-        permission(isSuper.superuser)
+        // permission(isSuper.superuser)
     },[cookies.token, isSuper.superuser, permission])
 
     return (
