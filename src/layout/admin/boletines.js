@@ -246,7 +246,7 @@ export default function Boletines(){
 						</ButtonGroup>
 					</Grid>
 					<Grid>
-					<FormControl className={classes.formControl} color="primary" size="small" variant="outlined" className={classes.formControl}>
+					<FormControl color="primary" size="small" variant="outlined" className={classes.formControl}>
 						<InputLabel id="demo-simple-select-outlined-label">Autor</InputLabel>
 						<Select
 						onChange={handleFilter}
