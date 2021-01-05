@@ -66,7 +66,7 @@ export default function Login(){
     }
     const login = (event) => {
         event.preventDefault()
-        fetch("http://nl-mtk.herokuapp.com/api/token/", {
+        fetch("https://nl-mtk.herokuapp.com/api/token/", {
             method: "POST",
             body: JSON.stringify(loginForm),
             headers: { "Content-type": "application/json" }
@@ -76,7 +76,7 @@ export default function Login(){
             let access = jwt.verify(data.access,'motk')
             if (access.user_id){
                 setToken(data.access)
-                fetch("http://localhost:8000/users/" + access.user_id + "/")
+                fetch("http://nl-mtk.herokuapp.com/api/v1/users/" + access.user_id + "/")
                 .then(data => data.json())
                 .then(user=>{
                     if(user.is_superuser){
